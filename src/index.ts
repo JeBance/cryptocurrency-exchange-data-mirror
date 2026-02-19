@@ -11,6 +11,21 @@ import { createLogger } from './utils/logger.js'
 const logger = createLogger('main')
 
 const app = express()
+
+// CORS middleware — разрешает запросы с любого домена (для GitHub Pages UI)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  
+  // Обработка preflight запросов
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200)
+  }
+  
+  next()
+})
+
 app.use(express.json())
 
 const collector = new DataCollector()
