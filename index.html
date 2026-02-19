@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Mirror — UI Development</title>
+    <style>
+        /* Сброс и базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-yellow: #eab308;
+            --border: #475569;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.offline {
+            background: var(--accent-red);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .stat-icon.blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .stat-icon.green { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+        .stat-icon.yellow { background: rgba(234, 179, 8, 0.2); color: var(--accent-yellow); }
+        .stat-icon.red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            font-size: 0.875rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-card);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--accent-green);
+        }
+
+        .badge.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+
+        .badge.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .badge.warning {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: var(--bg-card);
+        }
+
+        .tab.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .checkbox-item:hover {
+            background: var(--border);
+        }
+
+        .checkbox-item.selected {
+            background: var(--accent-blue);
+        }
+
+        .checkbox-item input {
+            display: none;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 80px;
+            right: 2rem;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-top: 0.5rem;
+            border-left: 4px solid var(--accent-green);
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error {
+            border-left-color: var(--accent-red);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Config Panel */
+        .config-panel {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-key {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .config-value {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--accent-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .main {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">📊</div>
+                <div>
+                    <h1>Data Mirror</h1>
+                    <span>Cryptocurrency Exchange Data Collector</span>
+                </div>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Подключение...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Uptime</span>
+                    <div class="stat-icon blue">⏱️</div>
+                </div>
+                <div class="stat-value" id="uptime">--:--:--</div>
+                <div class="stat-change" id="startTime">Запущен: --</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Подключения</span>
+                    <div class="stat-icon green">🔌</div>
+                </div>
+                <div class="stat-value" id="connections">0/0</div>
+                <div class="stat-change">WebSocket соединений</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Сообщений</span>
+                    <div class="stat-icon yellow">📨</div>
+                </div>
+                <div class="stat-value" id="messages">0</div>
+                <div class="stat-change">Получено всего</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Ошибки</span>
+                    <div class="stat-icon red">⚠️</div>
+                </div>
+                <div class="stat-value" id="errors">0</div>
+                <div class="stat-change">Всего ошибок</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="connections">Подключения</button>
+            <button class="tab" data-tab="symbols">Символы</button>
+            <button class="tab" data-tab="stats">Статистика</button>
+            <button class="tab" data-tab="config">Конфигурация</button>
+        </div>
+
+        <!-- Tab Content: Connections -->
+        <div id="connectionsTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Статус подключений</h2>
+                    <button class="btn btn-primary btn-sm" onclick="refreshData()">🔄 Обновить</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Биржа</th>
+                                    <th>Рынок</th>
+                                    <th>Статус</th>
+                                    <th>Последнее подключение</th>
+                                    <th>Переподключения</th>
+                                </tr>
+                            </thead>
+                            <tbody id="connectionsTable">
+                                <tr>
+                                    <td colspan="5" class="loading">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Symbols -->
+        <div id="symbolsTab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Отслеживаемые символы</h2>
+                    <button class="btn btn-primary btn-sm" onclick="openAddSymbolModal()">➕ Добавить</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Биржа</th>
+                                    <th>Символ</th>
+                                    <th>Типы данных</th>
+                                    <th>Сообщений</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="symbolsTable">
+                                <tr>
+                                    <td colspan="5" class="loading">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Stats -->
+        <div id="statsTab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Детальная статистика</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Биржа</th>
+                                    <th>Символ</th>
+                                    <th>Тип данных</th>
+                                    <th>Получено</th>
+                                    <th>Сохранено</th>
+                                    <th>Ошибки</th>
+                                    <th>Последнее сообщение</th>
+                                </tr>
+                            </thead>
+                            <tbody id="statsTable">
+                                <tr>
+                                    <td colspan="7" class="loading">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Config -->
+        <div id="configTab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Конфигурация хранилища</h2>
+                </div>
+                <div class="card-body">
+                    <div class="config-panel" id="configPanel">
+                        <!-- Заполняется через JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <span id="footerSymbols">0 символов</span> • 
+                <span id="footerMessages">0 сообщений</span> • 
+                <span id="footerErrors">0 ошибок</span>
+            </div>
+            <div>
+                Автообновление: 5 сек • 
+                <a href="https://github.com/JeBance/cryptocurrency-exchange-data-mirror" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Symbol Modal -->
+    <div class="modal-overlay" id="addSymbolModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить символ</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Биржа</label>
+                    <select class="form-select" id="modalExchange">
+                        <option value="binance">Binance</option>
+                        <option value="bybit">Bybit</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Символ</label>
+                    <input type="text" class="form-input" id="modalSymbol" placeholder="Например: SOLUSDT">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Типы данных</label>
+                    <div class="checkbox-group" id="modalDataTypes">
+                        <label class="checkbox-item selected">
+                            <input type="checkbox" value="trades" checked>
+                            trades
+                        </label>
+                        <label class="checkbox-item selected">
+                            <input type="checkbox" value="kline" checked>
+                            kline
+                        </label>
+                        <label class="checkbox-item selected">
+                            <input type="checkbox" value="ticker" checked>
+                            ticker
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="orderbook">
+                            orderbook
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" value="funding">
+                            funding
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAddSymbolModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="addSymbol()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Конфигурация - измените порт если нужно
+        const API_BASE = 'http://localhost:3030/api/v1';
+        let refreshInterval;
+
+        // Форматирование чисел
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        // Форматирование времени
+        function formatUptime(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days}d ${hours % 24}h ${minutes % 60}m`;
+            if (hours > 0) return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
+            if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+            return `${seconds}s`;
+        }
+
+        function formatTime(dateStr) {
+            if (!dateStr) return '--';
+            return new Date(dateStr).toLocaleTimeString('ru-RU');
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '--';
+            return new Date(dateStr).toLocaleString('ru-RU');
+        }
+
+        // API запросы
+        async function fetchApi(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                return data.data || data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Обновление данных
+        async function refreshData() {
+            try {
+                const status = await fetchApi('/status');
+                updateUI(status);
+                updateStatusDot(true);
+            } catch (error) {
+                updateStatusDot(false);
+                showToast('Ошибка подключения к API', 'error');
+            }
+        }
+
+        // Обновление UI
+        function updateUI(data) {
+            // Stats
+            document.getElementById('uptime').textContent = formatUptime(data.uptime);
+            document.getElementById('startTime').textContent = `Запущен: ${formatDateTime(data.startTime)}`;
+            
+            const connectedCount = data.connections.filter(c => c.connected).length;
+            document.getElementById('connections').textContent = `${connectedCount}/${data.connections.length}`;
+            
+            const totalMessages = data.stats.reduce((sum, s) => sum + s.messagesReceived, 0);
+            document.getElementById('messages').textContent = formatNumber(totalMessages);
+            
+            const totalErrors = data.stats.reduce((sum, s) => sum + s.errors, 0);
+            document.getElementById('errors').textContent = totalErrors;
+
+            // Connections Table
+            const connectionsHtml = data.connections.map(c => `
+                <tr>
+                    <td><strong>${c.exchange}</strong></td>
+                    <td>${c.market}</td>
+                    <td>
+                        <span class="badge ${c.connected ? 'success' : 'error'}">
+                            ${c.connected ? '✓ Подключено' : '✗ Отключено'}
+                        </span>
+                    </td>
+                    <td>${formatDateTime(c.lastConnected)}</td>
+                    <td>${c.reconnectAttempts}</td>
+                </tr>
+            `).join('');
+            document.getElementById('connectionsTable').innerHTML = connectionsHtml;
+
+            // Symbols Table
+            const symbolsMap = new Map();
+            for (const stat of data.stats) {
+                const key = `${stat.exchange}_${stat.symbol}`;
+                if (!symbolsMap.has(key)) {
+                    symbolsMap.set(key, {
+                        exchange: stat.exchange,
+                        symbol: stat.symbol,
+                        dataTypes: [],
+                        messagesReceived: 0,
+                        errors: 0
+                    });
+                }
+                const sym = symbolsMap.get(key);
+                sym.dataTypes.push(stat.dataType);
+                sym.messagesReceived += stat.messagesReceived;
+                sym.errors += stat.errors;
+            }
+
+            const symbolsHtml = Array.from(symbolsMap.values()).map(s => `
+                <tr>
+                    <td><strong>${s.exchange}</strong></td>
+                    <td><code>${s.symbol}</code></td>
+                    <td>
+                        ${s.dataTypes.map(dt => `<span class="badge info">${dt}</span>`).join(' ')}
+                    </td>
+                    <td>${formatNumber(s.messagesReceived)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="removeSymbol('${s.exchange}', '${s.symbol}')">
+                            🗑️ Удалить
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('symbolsTable').innerHTML = symbolsHtml || '<tr><td colspan="5">Нет данных</td></tr>';
+
+            // Stats Table
+            const statsHtml = data.stats.map(s => `
+                <tr>
+                    <td><strong>${s.exchange}</strong></td>
+                    <td><code>${s.symbol}</code></td>
+                    <td><span class="badge info">${s.dataType}</span></td>
+                    <td>${formatNumber(s.messagesReceived)}</td>
+                    <td>${formatNumber(s.messagesStored)}</td>
+                    <td>${s.errors > 0 ? `<span class="badge error">${s.errors}</span>` : '0'}</td>
+                    <td>${formatTime(s.lastMessageTime)}</td>
+                </tr>
+            `).join('');
+            document.getElementById('statsTable').innerHTML = statsHtml || '<tr><td colspan="7">Нет данных</td></tr>';
+
+            // Config
+            const configHtml = `
+                <div class="config-item">
+                    <span class="config-key">Тип хранилища</span>
+                    <span class="config-value">${data.storageType}</span>
+                </div>
+                <div class="config-item">
+                    <span class="config-key">Путь</span>
+                    <span class="config-value">${data.storagePath || '--'}</span>
+                </div>
+            `;
+            document.getElementById('configPanel').innerHTML = configHtml;
+
+            // Footer
+            document.getElementById('footerSymbols').textContent = `${symbolsMap.size} символов`;
+            document.getElementById('footerMessages').textContent = `${formatNumber(totalMessages)} сообщений`;
+            document.getElementById('footerErrors').textContent = `${totalErrors} ошибок`;
+        }
+
+        // Status dot
+        function updateStatusDot(connected) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            
+            if (connected) {
+                dot.classList.remove('offline');
+                text.textContent = 'Подключено';
+            } else {
+                dot.classList.add('offline');
+                text.textContent = 'Отключено';
+            }
+        }
+
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                const tabName = tab.dataset.tab;
+                document.getElementById(`${tabName}Tab`).style.display = 'block';
+            });
+        });
+
+        // Modal
+        function openAddSymbolModal() {
+            document.getElementById('addSymbolModal').classList.add('active');
+        }
+
+        function closeAddSymbolModal() {
+            document.getElementById('addSymbolModal').classList.remove('active');
+            document.getElementById('modalSymbol').value = '';
+        }
+
+        // Checkbox toggle
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                const checkbox = item.querySelector('input');
+                checkbox.checked = !checkbox.checked;
+                item.classList.toggle('selected', checkbox.checked);
+            });
+        });
+
+        // Add Symbol
+        async function addSymbol() {
+            const exchange = document.getElementById('modalExchange').value;
+            const symbol = document.getElementById('modalSymbol').value.toUpperCase();
+            const dataTypes = Array.from(document.querySelectorAll('#modalDataTypes input:checked'))
+                .map(cb => cb.value);
+
+            if (!symbol) {
+                showToast('Введите символ', 'error');
+                return;
+            }
+
+            if (dataTypes.length === 0) {
+                showToast('Выберите хотя бы один тип данных', 'error');
+                return;
+            }
+
+            try {
+                await fetchApi('/symbols', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        exchange,
+                        symbols: [symbol],
+                        dataTypes,
+                        intervals: ['1m', '5m', '1h']
+                    })
+                });
+                
+                showToast(`Символ ${symbol} добавлен`);
+                closeAddSymbolModal();
+                refreshData();
+            } catch (error) {
+                showToast('Ошибка добавления символа', 'error');
+            }
+        }
+
+        // Remove Symbol
+        async function removeSymbol(exchange, symbol) {
+            if (!confirm(`Удалить ${symbol} с ${exchange}?`)) return;
+
+            try {
+                await fetchApi(`/symbols/${exchange}/${symbol}`, {
+                    method: 'DELETE'
+                });
+                
+                showToast(`Символ ${symbol} удалён`);
+                refreshData();
+            } catch (error) {
+                showToast('Ошибка удаления символа', 'error');
+            }
+        }
+
+        // Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshData();
+            refreshInterval = setInterval(refreshData, 5000);
+        });
+
+        // Close modal on overlay click
+        document.getElementById('addSymbolModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addSymbolModal') {
+                closeAddSymbolModal();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAddSymbolModal();
+            }
+        });
+    </script>
+</body>
+</html>
