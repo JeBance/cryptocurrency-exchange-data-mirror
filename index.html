@@ -292,7 +292,27 @@
         }
         .config-item:last-child { border-bottom: none; }
         .config-key { color: var(--text-secondary); font-size: 0.875rem; }
-        .config-value { font-family: monospace; font-size: 0.875rem; color: var(--accent-green); }
+        .config-value { font-family: monospace; font-size: 0.75rem; color: var(--accent-green); word-break: break-all; }
+        .api-key-display {
+            background: var(--bg-card);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            margin-top: 0.5rem;
+            border: 1px solid var(--border);
+        }
+        .auth-required {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            text-align: center;
+        }
+        .auth-required h2 { margin-bottom: 1rem; }
+        .auth-required p { color: var(--text-muted); margin-bottom: 1.5rem; }
         @media (max-width: 768px) {
             .header { padding: 1rem; }
             .main { padding: 1rem; }
@@ -319,103 +339,111 @@
     </header>
 
     <main class="main">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Uptime</span>
-                    <div class="stat-icon blue">⏱️</div>
-                </div>
-                <div class="stat-value" id="uptime">--:--:--</div>
-                <div class="stat-change" id="startTime">Запущен: --</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Подключения</span>
-                    <div class="stat-icon green">🔌</div>
-                </div>
-                <div class="stat-value" id="connections">0/0</div>
-                <div class="stat-change">WebSocket соединений</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Сообщений</span>
-                    <div class="stat-icon yellow">📨</div>
-                </div>
-                <div class="stat-value" id="messages">0</div>
-                <div class="stat-change">Получено всего</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-label">Ошибки</span>
-                    <div class="stat-icon red">⚠️</div>
-                </div>
-                <div class="stat-value" id="errors">0</div>
-                <div class="stat-change">Всего ошибок</div>
-            </div>
+        <!-- Auth Required Screen -->
+        <div id="authScreen" class="auth-required" style="display: none;">
+            <h2>🔑 Требуется авторизация</h2>
+            <p>Введите API ключ для доступа к микросервису</p>
+            <button class="btn btn-primary" onclick="openSettingsModal()">Настроить подключение</button>
         </div>
 
-        <div class="tabs">
-            <button class="tab active" data-tab="connections">Подключения</button>
-            <button class="tab" data-tab="symbols">Символы</button>
-            <button class="tab" data-tab="stats">Статистика</button>
-            <button class="tab" data-tab="config">Конфигурация</button>
-        </div>
-
-        <div id="connectionsTab" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Статус подключений</h2>
-                    <button class="btn btn-primary btn-sm" onclick="refreshData()">🔄 Обновить</button>
+        <!-- Main Content -->
+        <div id="mainContent">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Uptime</span>
+                        <div class="stat-icon blue">⏱️</div>
+                    </div>
+                    <div class="stat-value" id="uptime">--:--:--</div>
+                    <div class="stat-change" id="startTime">Запущен: --</div>
                 </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr><th>Биржа</th><th>Рынок</th><th>Статус</th><th>Последнее подключение</th><th>Переподключения</th></tr>
-                            </thead>
-                            <tbody id="connectionsTable"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
-                        </table>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Подключения</span>
+                        <div class="stat-icon green">🔌</div>
+                    </div>
+                    <div class="stat-value" id="connections">0/0</div>
+                    <div class="stat-change">WebSocket соединений</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Сообщений</span>
+                        <div class="stat-icon yellow">📨</div>
+                    </div>
+                    <div class="stat-value" id="messages">0</div>
+                    <div class="stat-change">Получено всего</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Ошибки</span>
+                        <div class="stat-icon red">⚠️</div>
+                    </div>
+                    <div class="stat-value" id="errors">0</div>
+                    <div class="stat-change">Всего ошибок</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="connections">Подключения</button>
+                <button class="tab" data-tab="symbols">Символы</button>
+                <button class="tab" data-tab="stats">Статистика</button>
+                <button class="tab" data-tab="config">Конфигурация</button>
+            </div>
+
+            <div id="connectionsTab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Статус подключений</h2>
+                        <button class="btn btn-primary btn-sm" onclick="refreshData()">🔄 Обновить</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>Биржа</th><th>Рынок</th><th>Статус</th><th>Последнее подключение</th><th>Переподключения</th></tr></thead>
+                                <tbody id="connectionsTable"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="symbolsTab" class="tab-content" style="display: none;">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Отслеживаемые символы</h2>
-                    <button class="btn btn-primary btn-sm" onclick="openAddSymbolModal()">➕ Добавить</button>
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>Биржа</th><th>Символ</th><th>Типы данных</th><th>Сообщений</th><th>Действия</th></tr></thead>
-                            <tbody id="symbolsTable"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
-                        </table>
+            <div id="symbolsTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Отслеживаемые символы</h2>
+                        <button class="btn btn-primary btn-sm" onclick="openAddSymbolModal()">➕ Добавить</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>Биржа</th><th>Символ</th><th>Типы данных</th><th>Сообщений</th><th>Действия</th></tr></thead>
+                                <tbody id="symbolsTable"><tr><td colspan="5" class="loading"><div class="spinner"></div></td></tr></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="statsTab" class="tab-content" style="display: none;">
-            <div class="card">
-                <div class="card-header"><h2 class="card-title">Детальная статистика</h2></div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>Биржа</th><th>Символ</th><th>Тип данных</th><th>Получено</th><th>Сохранено</th><th>Ошибки</th><th>Последнее сообщение</th></tr></thead>
-                            <tbody id="statsTable"><tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr></tbody>
-                        </table>
+            <div id="statsTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header"><h2 class="card-title">Детальная статистика</h2></div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead><tr><th>Биржа</th><th>Символ</th><th>Тип данных</th><th>Получено</th><th>Сохранено</th><th>Ошибки</th><th>Последнее сообщение</th></tr></thead>
+                                <tbody id="statsTable"><tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="configTab" class="tab-content" style="display: none;">
-            <div class="card">
-                <div class="card-header"><h2 class="card-title">Конфигурация</h2></div>
-                <div class="card-body">
-                    <div class="config-panel" id="configPanel"></div>
+            <div id="configTab" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="card-header"><h2 class="card-title">Конфигурация</h2></div>
+                    <div class="card-body">
+                        <div class="config-panel" id="configPanel"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -428,6 +456,7 @@
         </div>
     </footer>
 
+    <!-- Add Symbol Modal -->
     <div class="modal-overlay" id="addSymbolModal">
         <div class="modal">
             <div class="modal-header"><h3 class="modal-title">Добавить символ</h3></div>
@@ -458,6 +487,7 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <div class="modal-header"><h3 class="modal-title">⚙️ Настройки подключения</h3></div>
@@ -465,10 +495,16 @@
                 <div class="form-group">
                     <label class="form-label">API URL микросервиса</label>
                     <input type="text" class="form-input" id="settingsApiUrl" placeholder="http://localhost:3030/api/v1">
-                    <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Укажите адрес вашего микросервиса Data Mirror</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">🔑 API Ключ</label>
+                    <input type="text" class="form-input" id="settingsApiKey" placeholder="Введите API ключ из консоли">
+                    <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">
+                        Ключ отображается в терминале при запуске микросервиса
+                    </small>
                 </div>
                 <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                    <strong style="font-size: 0.875rem;">Примеры:</strong>
+                    <strong style="font-size: 0.875rem;">Примеры URL:</strong>
                     <ul style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; padding-left: 1rem;">
                         <li>Локально: http://localhost:3030/api/v1</li>
                         <li>Сервер: http://192.168.1.100:3030/api/v1</li>
@@ -486,14 +522,25 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        // Конфигурация
         const DEFAULT_API = 'http://localhost:3030/api/v1';
+        
         function getApiBase() {
             const urlParams = new URLSearchParams(window.location.search);
             const apiFromUrl = urlParams.get('api');
             if (apiFromUrl) { localStorage.setItem('dataMirrorApi', apiFromUrl); return apiFromUrl; }
             return localStorage.getItem('dataMirrorApi') || DEFAULT_API;
         }
+        
+        function getApiKey() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const keyFromUrl = urlParams.get('key');
+            if (keyFromUrl) { localStorage.setItem('dataMirrorKey', keyFromUrl); return keyFromUrl; }
+            return localStorage.getItem('dataMirrorKey') || '';
+        }
+        
         let API_BASE = getApiBase();
+        let API_KEY = getApiKey();
         let refreshInterval;
 
         function formatNumber(num) {
@@ -501,6 +548,7 @@
             if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
             return num.toString();
         }
+        
         function formatUptime(ms) {
             const seconds = Math.floor(ms / 1000);
             const minutes = Math.floor(seconds / 60);
@@ -511,24 +559,62 @@
             if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
             return `${seconds}s`;
         }
+        
         function formatTime(dateStr) { return dateStr ? new Date(dateStr).toLocaleTimeString('ru-RU') : '--'; }
         function formatDateTime(dateStr) { return dateStr ? new Date(dateStr).toLocaleString('ru-RU') : '--'; }
 
         async function fetchApi(endpoint, options = {}) {
             try {
-                const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY,
+                        ...options.headers
+                    }
+                });
+                
+                if (response.status === 401) {
+                    showAuthScreen();
+                    throw new Error('Требуется API ключ');
+                }
+                
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
                 const data = await response.json();
                 return data.data || data;
-            } catch (error) { console.error('API Error:', error); throw error; }
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        function showAuthScreen() {
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'none';
+            updateStatusDot(false);
+            document.getElementById('statusText').textContent = 'Требуется ключ';
+        }
+
+        function hideAuthScreen() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
         }
 
         async function refreshData() {
+            if (!API_KEY) {
+                showAuthScreen();
+                return;
+            }
+            
             try {
                 const status = await fetchApi('/status');
+                hideAuthScreen();
                 updateUI(status);
                 updateStatusDot(true);
-            } catch (error) { updateStatusDot(false); showToast('Ошибка подключения к API', 'error'); }
+            } catch (error) {
+                updateStatusDot(false);
+            }
         }
 
         function updateUI(data) {
@@ -570,6 +656,7 @@
 
             document.getElementById('configPanel').innerHTML = `
                 <div class="config-item"><span class="config-key">API URL</span><span class="config-value">${API_BASE}</span></div>
+                <div class="config-item"><span class="config-key">API Ключ</span><span class="config-value">${API_KEY ? API_KEY.substring(0, 16) + '...' : 'не задан'}</span></div>
                 <div class="config-item"><span class="config-key">Тип хранилища</span><span class="config-value">${data.storageType}</span></div>
                 <div class="config-item"><span class="config-key">Путь</span><span class="config-value">${data.storagePath || '--'}</span></div>`;
 
@@ -596,7 +683,13 @@
 
         function openAddSymbolModal() { document.getElementById('addSymbolModal').classList.add('active'); }
         function closeAddSymbolModal() { document.getElementById('addSymbolModal').classList.remove('active'); document.getElementById('modalSymbol').value = ''; }
-        function openSettingsModal() { document.getElementById('settingsApiUrl').value = API_BASE; document.getElementById('settingsModal').classList.add('active'); }
+        
+        function openSettingsModal() {
+            document.getElementById('settingsApiUrl').value = API_BASE;
+            document.getElementById('settingsApiKey').value = API_KEY;
+            document.getElementById('settingsModal').classList.add('active');
+        }
+        
         function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
 
         document.querySelectorAll('.checkbox-item').forEach(item => {
@@ -633,12 +726,20 @@
 
         function saveSettings() {
             const newUrl = document.getElementById('settingsApiUrl').value.trim();
+            const newKey = document.getElementById('settingsApiKey').value.trim();
+            
             if (!newUrl) { showToast('Введите URL', 'error'); return; }
+            if (!newKey) { showToast('Введите API ключ', 'error'); return; }
+            
             try { new URL(newUrl); } catch { showToast('Некорректный URL', 'error'); return; }
+            
             localStorage.setItem('dataMirrorApi', newUrl);
+            localStorage.setItem('dataMirrorKey', newKey);
             API_BASE = newUrl;
+            API_KEY = newKey;
+            
             closeSettingsModal();
-            showToast('URL сохранён');
+            showToast('Настройки сохранены');
             refreshData();
         }
 
@@ -650,7 +751,18 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        document.addEventListener('DOMContentLoaded', () => { console.log('API URL:', API_BASE); refreshData(); refreshInterval = setInterval(refreshData, 5000); });
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('API URL:', API_BASE);
+            console.log('API Key:', API_KEY ? 'установлен' : 'не задан');
+            
+            if (!API_KEY) {
+                showAuthScreen();
+            } else {
+                refreshData();
+                refreshInterval = setInterval(refreshData, 5000);
+            }
+        });
+        
         document.getElementById('addSymbolModal').addEventListener('click', (e) => { if (e.target.id === 'addSymbolModal') closeAddSymbolModal(); });
         document.getElementById('settingsModal').addEventListener('click', (e) => { if (e.target.id === 'settingsModal') closeSettingsModal(); });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeAddSymbolModal(); closeSettingsModal(); } });

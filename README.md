@@ -52,6 +52,50 @@
 - 📊 **Мониторинг** — Prometheus метрики и REST API
 - 🎛️ **Динамическое управление** — добавление символов без перезапуска
 - ⚙️ **Полная конфигурация** — все URL и пути через переменные окружения
+- 🔐 **Защита API ключом** — генерация ключа при каждом запуске
+
+---
+
+## 🔐 Безопасность
+
+### API Ключ
+
+При каждом запуске микросервис генерирует уникальный API ключ, который отображается в консоли:
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║                    DATA MIRROR ЗАПУЩЕН                         ║
+╠════════════════════════════════════════════════════════════════╣
+║  🔑 API КЛЮЧ (сохраните его!):                                  ║
+║                                                                  ║
+║  f997bb43c077463292bc68d3ccf17dd1ee79fd5df43e157579ac990cc0aed67c║
+╚════════════════════════════════════════════════════════════════╝
+```
+
+### Использование ключа
+
+Все запросы к API (кроме `/health`) требуют передачи ключа в заголовке `X-API-Key`:
+
+```bash
+# Без ключа — ошибка 401
+curl http://localhost:3030/api/v1/status
+# {"success":false,"error":"Требуется API ключ. Передайте заголовок X-API-Key"}
+
+# С ключом — успешный запрос
+curl -H "X-API-Key: YOUR_API_KEY" http://localhost:3030/api/v1/status
+```
+
+### Постоянный ключ
+
+Для использования постоянного ключа задайте переменную `API_KEY`:
+
+```bash
+# Через .env файл
+API_KEY=your-secret-key-here
+
+# Или через командную строку
+API_KEY=my-secret-key npm start
+```
 
 ---
 
@@ -184,20 +228,27 @@ BYBIT_SYMBOLS=BTCUSDT,ETHUSDT
 ### Примеры запросов
 
 ```bash
-# Статус
-curl http://localhost:3030/api/v1/status
+# Проверка здоровья (без ключа)
+curl http://localhost:3030/api/v1/health
+
+# Статус (требуется ключ)
+curl -H "X-API-Key: YOUR_API_KEY" http://localhost:3030/api/v1/status
 
 # Добавить символ
 curl -X POST http://localhost:3030/api/v1/symbols \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -d '{"exchange":"binance","symbols":["SOLUSDT"],"dataTypes":["trades","ticker"]}'
 
 # Удалить символ
-curl -X DELETE http://localhost:3030/api/v1/symbols/binance/SOLUSDT
+curl -X DELETE \
+  -H "X-API-Key: YOUR_API_KEY" \
+  http://localhost:3030/api/v1/symbols/binance/SOLUSDT
 
 # Backfill исторических данных
 curl -X POST http://localhost:3030/api/v1/backfill \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -d '{"exchange":"binance","symbol":"BTCUSDT","dataType":"kline","interval":"1m"}'
 ```
 
