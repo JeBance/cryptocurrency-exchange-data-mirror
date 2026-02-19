@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Mirror — UI Development</title>
+    <title>Data Mirror — UI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -18,10 +18,9 @@
             --accent-blue: #3b82f6;
             --accent-yellow: #eab308;
             --border: #475569;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
@@ -88,12 +87,7 @@
             margin-bottom: 0.5rem;
         }
         .stat-label { color: var(--text-secondary); font-size: 0.875rem; }
-        .stat-icon {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-        }
+        .stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
         .stat-icon.blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
         .stat-icon.green { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
         .stat-icon.yellow { background: rgba(234, 179, 8, 0.2); color: var(--accent-yellow); }
@@ -117,206 +111,78 @@
         .card-body { padding: 1.5rem; }
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        th, td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        th {
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--text-secondary); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; }
         td { font-size: 0.875rem; }
         tr:last-child td { border-bottom: none; }
         tr:hover { background: var(--bg-card); }
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
         .badge.success { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
         .badge.error { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
         .badge.info { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
         .btn-primary { background: var(--accent-blue); color: white; }
         .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: var(--accent-green); color: white; }
         .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+        .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); }
         .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; }
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
-        .tab {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-        }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; flex-wrap: wrap; }
+        .tab { padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; cursor: pointer; background: transparent; border: none; color: var(--text-secondary); transition: all 0.2s; }
         .tab:hover { background: var(--bg-card); }
         .tab.active { background: var(--accent-blue); color: white; }
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            border: 1px solid var(--border);
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-        .modal-overlay.active .modal { transform: scale(1); }
+        .modal { background: var(--bg-secondary); border-radius: 12px; width: 100%; max-width: 500px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
         .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
         .modal-title { font-size: 1.25rem; font-weight: 600; }
         .modal-body { padding: 1.5rem; }
-        .modal-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; }
         .form-group { margin-bottom: 1rem; }
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        .form-input, .form-select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-size: 0.875rem;
-        }
+        .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-secondary); }
+        .form-input, .form-select { width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 0.875rem; }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent-blue); }
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--bg-card);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-            user-select: none;
-        }
+        .checkbox-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--bg-card); border-radius: 8px; cursor: pointer; font-size: 0.875rem; transition: all 0.2s; user-select: none; }
         .checkbox-item:hover { background: var(--border); }
         .checkbox-item.selected { background: var(--accent-blue); }
         .checkbox-item input { display: none; }
         .toast-container { position: fixed; bottom: 80px; right: 2rem; z-index: 2000; }
-        .toast {
-            background: var(--bg-card);
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            margin-top: 0.5rem;
-            border-left: 4px solid var(--accent-green);
-            box-shadow: var(--shadow);
-            animation: slideIn 0.3s ease;
-        }
+        .toast { background: var(--bg-card); border-radius: 8px; padding: 1rem 1.5rem; margin-top: 0.5rem; border-left: 4px solid var(--accent-green); animation: slideIn 0.3s ease; }
         .toast.error { border-left-color: var(--accent-red); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 1rem 2rem;
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-        }
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 1rem 2rem; position: fixed; bottom: 0; left: 0; right: 0; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; color: var(--text-muted); }
         .footer a { color: var(--accent-blue); text-decoration: none; }
         .loading { display: flex; align-items: center; justify-content: center; padding: 2rem; }
-        .spinner {
-            width: 32px; height: 32px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .config-panel { background: var(--bg-card); border-radius: 8px; padding: 1rem; }
-        .config-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
+        .config-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
         .config-item:last-child { border-bottom: none; }
-        .config-key { color: var(--text-secondary); font-size: 0.875rem; }
-        .config-value { font-family: monospace; font-size: 0.75rem; color: var(--accent-green); word-break: break-all; }
-        .api-key-display {
-            background: var(--bg-card);
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.75rem;
-            word-break: break-all;
-            margin-top: 0.5rem;
-            border: 1px solid var(--border);
-        }
-        .auth-required {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 300px;
-            text-align: center;
-        }
+        .config-key { color: var(--text-secondary); font-size: 0.875rem; flex: 0 0 150px; }
+        .config-value { font-family: monospace; font-size: 0.8rem; color: var(--accent-green); word-break: break-all; flex: 1; text-align: right; }
+        .config-input { width: 100%; max-width: 300px; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary); font-size: 0.875rem; }
+        .auth-required { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center; }
         .auth-required h2 { margin-bottom: 1rem; }
         .auth-required p { color: var(--text-muted); margin-bottom: 1.5rem; }
+        .exchange-section { background: var(--bg-card); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; }
+        .exchange-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .exchange-name { font-size: 1.125rem; font-weight: 600; }
+        .toggle-switch { position: relative; width: 50px; height: 26px; background: var(--border); border-radius: 13px; cursor: pointer; transition: background 0.3s; }
+        .toggle-switch.active { background: var(--accent-green); }
+        .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left 0.3s; }
+        .toggle-switch.active::after { left: 27px; }
+        .symbol-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .symbol-tag { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; background: var(--bg-secondary); border-radius: 9999px; font-size: 0.75rem; font-family: monospace; }
+        .symbol-tag button { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0; font-size: 1rem; line-height: 1; }
+        .symbol-tag button:hover { color: var(--accent-red); }
+        .info-text { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; }
         @media (max-width: 768px) {
             .header { padding: 1rem; }
             .main { padding: 1rem; }
             .stats-grid { grid-template-columns: 1fr; }
+            .exchange-header { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
         }
     </style>
 </head>
@@ -339,14 +205,12 @@
     </header>
 
     <main class="main">
-        <!-- Auth Required Screen -->
         <div id="authScreen" class="auth-required" style="display: none;">
             <h2>🔑 Требуется авторизация</h2>
             <p>Введите API ключ для доступа к микросервису</p>
             <button class="btn btn-primary" onclick="openSettingsModal()">Настроить подключение</button>
         </div>
 
-        <!-- Main Content -->
         <div id="mainContent">
             <div class="stats-grid">
                 <div class="stat-card">
@@ -387,7 +251,7 @@
                 <button class="tab active" data-tab="connections">Подключения</button>
                 <button class="tab" data-tab="symbols">Символы</button>
                 <button class="tab" data-tab="stats">Статистика</button>
-                <button class="tab" data-tab="config">Конфигурация</button>
+                <button class="tab" data-tab="settings">Настройки</button>
             </div>
 
             <div id="connectionsTab" class="tab-content">
@@ -438,11 +302,42 @@
                 </div>
             </div>
 
-            <div id="configTab" class="tab-content" style="display: none;">
+            <div id="settingsTab" class="tab-content" style="display: none;">
                 <div class="card">
-                    <div class="card-header"><h2 class="card-title">Конфигурация</h2></div>
+                    <div class="card-header">
+                        <h2 class="card-title">⚙️ Настройки конфигурации</h2>
+                        <button class="btn btn-primary btn-sm" onclick="loadConfig()">🔄 Обновить</button>
+                    </div>
                     <div class="card-body">
-                        <div class="config-panel" id="configPanel"></div>
+                        <p class="info-text" style="margin-bottom: 1rem;">Изменения сохраняются в .env файл и применяются при следующем запуске микросервиса.</p>
+                        
+                        <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-secondary);">Биржи</h3>
+                        
+                        <div id="exchangeSettings"></div>
+                        
+                        <h3 style="font-size: 1rem; margin: 1.5rem 0 1rem; color: var(--text-secondary);">Хранилище</h3>
+                        
+                        <div class="config-panel" id="storageSettings">
+                            <div class="config-item">
+                                <span class="config-key">Тип хранилища</span>
+                                <select class="config-input" id="storageType" onchange="updateStorageSetting()">
+                                    <option value="file">Файлы (JSON)</option>
+                                    <option value="mongodb">MongoDB</option>
+                                </select>
+                            </div>
+                            <div class="config-item" id="storagePathRow">
+                                <span class="config-key">Путь к данным</span>
+                                <input type="text" class="config-input" id="storagePath" value="./data" onchange="updateStorageSetting()">
+                            </div>
+                            <div class="config-item" id="mongoUrlRow" style="display: none;">
+                                <span class="config-key">MongoDB URL</span>
+                                <input type="text" class="config-input" id="mongoUrl" placeholder="mongodb://localhost:27017" onchange="updateStorageSetting()">
+                            </div>
+                            <div class="config-item" id="mongoDbRow" style="display: none;">
+                                <span class="config-key">База данных</span>
+                                <input type="text" class="config-input" id="mongoDb" value="data_mirror" onchange="updateStorageSetting()">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -499,17 +394,7 @@
                 <div class="form-group">
                     <label class="form-label">🔑 API Ключ</label>
                     <input type="text" class="form-input" id="settingsApiKey" placeholder="Введите API ключ из консоли">
-                    <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">
-                        Ключ отображается в терминале при запуске микросервиса
-                    </small>
-                </div>
-                <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                    <strong style="font-size: 0.875rem;">Примеры URL:</strong>
-                    <ul style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; padding-left: 1rem;">
-                        <li>Локально: http://localhost:3030/api/v1</li>
-                        <li>Сервер: http://192.168.1.100:3030/api/v1</li>
-                        <li>VPS: http://your-server.com:3030/api/v1</li>
-                    </ul>
+                    <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">Ключ отображается в терминале при запуске микросервиса</small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -522,26 +407,10 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        // Конфигурация
         const DEFAULT_API = 'http://localhost:3030/api/v1';
-        
-        function getApiBase() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const apiFromUrl = urlParams.get('api');
-            if (apiFromUrl) { localStorage.setItem('dataMirrorApi', apiFromUrl); return apiFromUrl; }
-            return localStorage.getItem('dataMirrorApi') || DEFAULT_API;
-        }
-        
-        function getApiKey() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const keyFromUrl = urlParams.get('key');
-            if (keyFromUrl) { localStorage.setItem('dataMirrorKey', keyFromUrl); return keyFromUrl; }
-            return localStorage.getItem('dataMirrorKey') || '';
-        }
-        
-        let API_BASE = getApiBase();
-        let API_KEY = getApiKey();
-        let refreshInterval;
+        let API_BASE = localStorage.getItem('dataMirrorApi') || DEFAULT_API;
+        let API_KEY = localStorage.getItem('dataMirrorKey') || '';
+        let fullConfig = null;
 
         function formatNumber(num) {
             if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -564,29 +433,14 @@
         function formatDateTime(dateStr) { return dateStr ? new Date(dateStr).toLocaleString('ru-RU') : '--'; }
 
         async function fetchApi(endpoint, options = {}) {
-            try {
-                const response = await fetch(`${API_BASE}${endpoint}`, {
-                    ...options,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': API_KEY,
-                        ...options.headers
-                    }
-                });
-                
-                if (response.status === 401) {
-                    showAuthScreen();
-                    throw new Error('Требуется API ключ');
-                }
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                return data.data || data;
-            } catch (error) {
-                console.error('API Error:', error);
-                throw error;
-            }
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY, ...options.headers }
+            });
+            if (response.status === 401) { showAuthScreen(); throw new Error('Требуется API ключ'); }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            return data.data || data;
         }
 
         function showAuthScreen() {
@@ -602,19 +456,134 @@
         }
 
         async function refreshData() {
-            if (!API_KEY) {
-                showAuthScreen();
-                return;
-            }
-            
+            if (!API_KEY) { showAuthScreen(); return; }
             try {
                 const status = await fetchApi('/status');
                 hideAuthScreen();
                 updateUI(status);
                 updateStatusDot(true);
-            } catch (error) {
-                updateStatusDot(false);
-            }
+            } catch (error) { updateStatusDot(false); }
+        }
+
+        async function loadConfig() {
+            try {
+                fullConfig = await fetchApi('/config');
+                renderExchangeSettings();
+                renderStorageSettings();
+                showToast('Конфигурация загружена');
+            } catch (error) { showToast('Ошибка загрузки конфигурации', 'error'); }
+        }
+
+        function renderExchangeSettings() {
+            if (!fullConfig) return;
+            const container = document.getElementById('exchangeSettings');
+            container.innerHTML = '';
+            
+            ['binance', 'bybit'].forEach(exchange => {
+                const cfg = fullConfig.exchanges[exchange];
+                const symbols = cfg.symbols.map(s => s.symbol);
+                
+                const div = document.createElement('div');
+                div.className = 'exchange-section';
+                div.innerHTML = `
+                    <div class="exchange-header">
+                        <span class="exchange-name">${exchange.charAt(0).toUpperCase() + exchange.slice(1)}</span>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Включена:</span>
+                            <div class="toggle-switch ${cfg.enabled ? 'active' : ''}" id="toggle_${exchange}" onclick="toggleExchange('${exchange}')"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Рынки</label>
+                        <input type="text" class="form-input" id="markets_${exchange}" value="${cfg.markets.join(', ')}" onchange="updateMarkets('${exchange}')">
+                        <p class="info-text">Для Binance: spot, futures. Для Bybit: spot, derivatives</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Символы</label>
+                        <div class="symbol-tags" id="symbols_${exchange}">
+                            ${symbols.map(s => `<span class="symbol-tag">${s}<button onclick="removeSymbolFromConfig('${exchange}', '${s}')">×</button></span>`).join('')}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="text" class="form-input" id="newSymbol_${exchange}" placeholder="Новый символ (например: SOLUSDT)" style="flex: 1;">
+                            <button class="btn btn-primary btn-sm" onclick="addSymbolToConfig('${exchange}')">Добавить</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderStorageSettings() {
+            if (!fullConfig) return;
+            const storage = fullConfig.storage;
+            
+            document.getElementById('storageType').value = storage.type;
+            document.getElementById('storagePath').value = storage.path || './data';
+            document.getElementById('mongoUrl').value = storage.mongoUrl || '';
+            document.getElementById('mongoDb').value = storage.mongoDb || 'data_mirror';
+            
+            toggleStorageFields();
+        }
+
+        function toggleStorageFields() {
+            const type = document.getElementById('storageType').value;
+            document.getElementById('storagePathRow').style.display = type === 'file' ? 'flex' : 'none';
+            document.getElementById('mongoUrlRow').style.display = type === 'mongodb' ? 'flex' : 'none';
+            document.getElementById('mongoDbRow').style.display = type === 'mongodb' ? 'flex' : 'none';
+        }
+
+        async function toggleExchange(exchange) {
+            const toggle = document.getElementById(`toggle_${exchange}`);
+            const enabled = !toggle.classList.contains('active');
+            
+            try {
+                await fetchApi(`/config/enabled/${exchange}`, { method: 'PUT', body: JSON.stringify({ enabled }) });
+                toggle.classList.toggle('active', enabled);
+                showToast(`${exchange} ${enabled ? 'включена' : 'выключена'}`);
+            } catch (error) { showToast('Ошибка', 'error'); }
+        }
+
+        async function updateMarkets(exchange) {
+            const markets = document.getElementById(`markets_${exchange}`).value.split(',').map(s => s.trim()).filter(Boolean);
+            try {
+                await fetchApi(`/config/markets/${exchange}`, { method: 'PUT', body: JSON.stringify({ markets }) });
+                showToast(`Рынки ${exchange} обновлены`);
+            } catch (error) { showToast('Ошибка', 'error'); }
+        }
+
+        async function addSymbolToConfig(exchange) {
+            const input = document.getElementById(`newSymbol_${exchange}`);
+            const symbol = input.value.toUpperCase().trim();
+            if (!symbol) return;
+            
+            try {
+                await fetchApi(`/config/symbols/${exchange}`, { method: 'PUT', body: JSON.stringify({ symbols: [...fullConfig.exchanges[exchange].symbols.map(s => s.symbol), symbol] }) });
+                input.value = '';
+                loadConfig();
+                showToast(`Символ ${symbol} добавлен в конфигурацию`);
+            } catch (error) { showToast('Ошибка', 'error'); }
+        }
+
+        async function removeSymbolFromConfig(exchange, symbol) {
+            const symbols = fullConfig.exchanges[exchange].symbols.map(s => s.symbol).filter(s => s !== symbol);
+            try {
+                await fetchApi(`/config/symbols/${exchange}`, { method: 'PUT', body: JSON.stringify({ symbols }) });
+                loadConfig();
+                showToast(`Символ ${symbol} удалён из конфигурации`);
+            } catch (error) { showToast('Ошибка', 'error'); }
+        }
+
+        async function updateStorageSetting() {
+            toggleStorageFields();
+            const type = document.getElementById('storageType').value;
+            const path = document.getElementById('storagePath').value;
+            const mongoUrl = document.getElementById('mongoUrl').value;
+            const mongoDb = document.getElementById('mongoDb').value;
+            
+            try {
+                await fetchApi('/config/storage', { method: 'PUT', body: JSON.stringify({ type, path, mongoUrl, mongoDb }) });
+                showToast('Настройки хранилища сохранены');
+            } catch (error) { showToast('Ошибка', 'error'); }
         }
 
         function updateUI(data) {
@@ -654,16 +623,6 @@
                 <td>${s.errors > 0 ? `<span class="badge error">${s.errors}</span>` : '0'}</td>
                 <td>${formatTime(s.lastMessageTime)}</td></tr>`).join('') || '<tr><td colspan="7">Нет данных</td></tr>';
 
-            document.getElementById('configPanel').innerHTML = `
-                <div class="config-item"><span class="config-key">API URL</span><span class="config-value">${API_BASE}</span></div>
-                <div class="config-item"><span class="config-key">API Ключ</span><span class="config-value">${API_KEY ? API_KEY.substring(0, 16) + '...' : 'не задан'}</span></div>
-                <div class="config-item"><span class="config-key">Тип хранилища</span><span class="config-value">${data.storage.type === 'file' ? 'Файлы (JSON)' : 'MongoDB'}</span></div>
-                ${data.storage.type === 'file' 
-                    ? `<div class="config-item"><span class="config-key">Путь к данным</span><span class="config-value">${data.storage.path || './data'}</span></div>`
-                    : `<div class="config-item"><span class="config-key">MongoDB URL</span><span class="config-value">${data.storage.mongoUrl || '--'}</span></div>
-                       <div class="config-item"><span class="config-key">База данных</span><span class="config-value">${data.storage.mongoDb || 'data_mirror'}</span></div>`
-                }`;
-
             document.getElementById('footerSymbols').textContent = `${symbolsMap.size} символов`;
             document.getElementById('footerMessages').textContent = `${formatNumber(totalMessages)} сообщений`;
             document.getElementById('footerErrors').textContent = `${totalErrors} ошибок`;
@@ -681,19 +640,19 @@
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-                document.getElementById(`${tab.dataset.tab}Tab`).style.display = 'block';
+                const tabId = tab.dataset.tab;
+                document.getElementById(`${tabId}Tab`).style.display = 'block';
+                if (tabId === 'settings') loadConfig();
             });
         });
 
         function openAddSymbolModal() { document.getElementById('addSymbolModal').classList.add('active'); }
         function closeAddSymbolModal() { document.getElementById('addSymbolModal').classList.remove('active'); document.getElementById('modalSymbol').value = ''; }
-        
         function openSettingsModal() {
             document.getElementById('settingsApiUrl').value = API_BASE;
             document.getElementById('settingsApiKey').value = API_KEY;
             document.getElementById('settingsModal').classList.add('active');
         }
-        
         function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
 
         document.querySelectorAll('.checkbox-item').forEach(item => {
@@ -731,17 +690,13 @@
         function saveSettings() {
             const newUrl = document.getElementById('settingsApiUrl').value.trim();
             const newKey = document.getElementById('settingsApiKey').value.trim();
-            
             if (!newUrl) { showToast('Введите URL', 'error'); return; }
             if (!newKey) { showToast('Введите API ключ', 'error'); return; }
-            
             try { new URL(newUrl); } catch { showToast('Некорректный URL', 'error'); return; }
-            
             localStorage.setItem('dataMirrorApi', newUrl);
             localStorage.setItem('dataMirrorKey', newKey);
             API_BASE = newUrl;
             API_KEY = newKey;
-            
             closeSettingsModal();
             showToast('Настройки сохранены');
             refreshData();
@@ -756,15 +711,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('API URL:', API_BASE);
-            console.log('API Key:', API_KEY ? 'установлен' : 'не задан');
-            
-            if (!API_KEY) {
-                showAuthScreen();
-            } else {
-                refreshData();
-                refreshInterval = setInterval(refreshData, 5000);
-            }
+            if (!API_KEY) showAuthScreen();
+            else { refreshData(); setInterval(refreshData, 5000); }
         });
         
         document.getElementById('addSymbolModal').addEventListener('click', (e) => { if (e.target.id === 'addSymbolModal') closeAddSymbolModal(); });

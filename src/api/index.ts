@@ -3,10 +3,11 @@
  */
 
 import express, { type Request, type Response } from 'express'
-import { config, type ExchangeName, type DataType, type SymbolConfig } from '../config/index.js'
+import { config, type ExchangeName, type DataType } from '../config/index.js'
 import type { DataCollector } from '../collectors/index.js'
 import { createLogger } from '../utils/logger.js'
 import { collectDefaultMetrics, Registry, Gauge } from 'prom-client'
+import * as configManager from '../config/manager.js'
 
 const logger = createLogger('api')
 
@@ -59,19 +60,32 @@ export function createApiRouter(collector: DataCollector): express.Router {
     res.json({ success: true, data: Array.from(symbols.values()) })
   })
 
+  // Добавление символа (с сохранением в .env)
   router.post('/symbols', async (req, res) => {
     try {
       const { exchange, symbols, dataTypes, intervals } = req.body
       if (!exchange || !symbols || !dataTypes) { res.status(400).json({ success: false, error: 'Укажите exchange, symbols, dataTypes' }); return }
-      for (const sym of symbols) await collector.addSymbol(exchange, { symbol: sym.toUpperCase(), dataTypes, intervals })
+      
+      for (const sym of symbols) {
+        await collector.addSymbol(exchange, { symbol: sym.toUpperCase(), dataTypes, intervals })
+        // Сохраняем в .env
+        configManager.addSymbol(exchange as ExchangeName, sym.toUpperCase())
+      }
       res.json({ success: true, message: `Добавлено ${symbols.length} символ(ов)` })
     } catch (error) { res.status(500).json({ success: false, error: 'Ошибка добавления' }) }
   })
 
+  // Удаление символа (с сохранением в .env)
   router.delete('/symbols/:exchange/:symbol', async (req, res) => {
     try {
-      await collector.removeSymbol(req.params.exchange as ExchangeName, req.params.symbol.toUpperCase())
-      res.json({ success: true, message: `Удалён ${req.params.symbol}` })
+      const exchange = req.params.exchange as ExchangeName
+      const symbol = req.params.symbol.toUpperCase()
+      
+      await collector.removeSymbol(exchange, symbol)
+      // Сохраняем в .env
+      configManager.removeSymbol(exchange, symbol)
+      
+      res.json({ success: true, message: `Удалён ${symbol}` })
     } catch (error) { res.status(500).json({ success: false, error: 'Ошибка удаления' }) }
   })
 
@@ -99,6 +113,93 @@ export function createApiRouter(collector: DataCollector): express.Router {
       res.set('Content-Type', register.contentType)
       res.send(await register.metrics())
     } catch { res.status(500).send('Ошибка генерации метрик') }
+  })
+
+  // =============== API для управления конфигурацией ===============
+
+  // Получить полную конфигурацию
+  router.get('/config', (_req, res) => {
+    try {
+      const cfg = configManager.getFullConfig()
+      res.json({ success: true, data: cfg })
+    } catch (error) {
+      logger.error({ error }, 'Ошибка получения конфигурации')
+      res.status(500).json({ success: false, error: 'Ошибка получения конфигурации' })
+    }
+  })
+
+  // Обновить символы биржи
+  router.put('/config/symbols/:exchange', (req, res) => {
+    try {
+      const exchange = req.params.exchange as ExchangeName
+      const { symbols } = req.body
+      
+      if (!symbols || !Array.isArray(symbols)) {
+        res.status(400).json({ success: false, error: 'Укажите массив symbols' })
+        return
+      }
+
+      configManager.updateSymbols(exchange, symbols.map((s: string) => s.toUpperCase()))
+      
+      res.json({ success: true, message: `Символы ${exchange} обновлены`, data: { exchange, symbols } })
+    } catch (error) {
+      logger.error({ error }, 'Ошибка обновления символов')
+      res.status(500).json({ success: false, error: 'Ошибка обновления символов' })
+    }
+  })
+
+  // Обновить markets биржи
+  router.put('/config/markets/:exchange', (req, res) => {
+    try {
+      const exchange = req.params.exchange as ExchangeName
+      const { markets } = req.body
+      
+      if (!markets || !Array.isArray(markets)) {
+        res.status(400).json({ success: false, error: 'Укажите массив markets' })
+        return
+      }
+
+      configManager.updateMarkets(exchange, markets)
+      
+      res.json({ success: true, message: `Markets ${exchange} обновлены`, data: { exchange, markets } })
+    } catch (error) {
+      logger.error({ error }, 'Ошибка обновления markets')
+      res.status(500).json({ success: false, error: 'Ошибка обновления markets' })
+    }
+  })
+
+  // Включить/выключить биржу
+  router.put('/config/enabled/:exchange', (req, res) => {
+    try {
+      const exchange = req.params.exchange as ExchangeName
+      const { enabled } = req.body
+      
+      if (typeof enabled !== 'boolean') {
+        res.status(400).json({ success: false, error: 'Укажите enabled (boolean)' })
+        return
+      }
+
+      configManager.setExchangeEnabled(exchange, enabled)
+      
+      res.json({ success: true, message: `${exchange} ${enabled ? 'включена' : 'выключена'}`, data: { exchange, enabled } })
+    } catch (error) {
+      logger.error({ error }, 'Ошибка обновления enabled')
+      res.status(500).json({ success: false, error: 'Ошибка обновления enabled' })
+    }
+  })
+
+  // Обновить настройки хранилища
+  router.put('/config/storage', (req, res) => {
+    try {
+      const { type, path, mongoUrl, mongoDb } = req.body
+      
+      configManager.updateStorage({ type, path, mongoUrl, mongoDb })
+      
+      res.json({ success: true, message: 'Настройки хранилища обновлены' })
+    } catch (error) {
+      logger.error({ error }, 'Ошибка обновления хранилища')
+      res.status(500).json({ success: false, error: 'Ошибка обновления хранилища' })
+    }
   })
 
   return router
