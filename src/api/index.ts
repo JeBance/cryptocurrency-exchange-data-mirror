@@ -26,7 +26,7 @@ export function createApiRouter(collector: DataCollector): express.Router {
   router.get('/status', (_req, res) => {
     try {
       const s = collector.getStatus()
-      res.json({ success: true, data: { uptime: s.uptime, startTime: s.startTime, storage: { type: s.storageType, path: s.storagePath }, connections: s.connections, stats: s.stats } })
+      res.json({ success: true, data: { uptime: s.uptime, startTime: s.startTime, storage: s.storage, connections: s.connections, stats: s.stats } })
     } catch (error) { res.status(500).json({ success: false, error: 'Ошибка сервера' }) }
   })
 

@@ -33,11 +33,17 @@ export interface CollectionStats {
   errors: number
 }
 
+export interface StorageStatus {
+  type: 'file' | 'mongodb'
+  path?: string
+  mongoUrl?: string
+  mongoDb?: string
+}
+
 export interface ServiceStatus {
   uptime: number
   startTime: Date
   connections: ConnectionStatus[]
   stats: CollectionStats[]
-  storageType: string
-  storagePath?: string
+  storage: StorageStatus
 }

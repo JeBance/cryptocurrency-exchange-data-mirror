@@ -657,8 +657,12 @@
             document.getElementById('configPanel').innerHTML = `
                 <div class="config-item"><span class="config-key">API URL</span><span class="config-value">${API_BASE}</span></div>
                 <div class="config-item"><span class="config-key">API Ключ</span><span class="config-value">${API_KEY ? API_KEY.substring(0, 16) + '...' : 'не задан'}</span></div>
-                <div class="config-item"><span class="config-key">Тип хранилища</span><span class="config-value">${data.storageType}</span></div>
-                <div class="config-item"><span class="config-key">Путь</span><span class="config-value">${data.storagePath || '--'}</span></div>`;
+                <div class="config-item"><span class="config-key">Тип хранилища</span><span class="config-value">${data.storage.type === 'file' ? 'Файлы (JSON)' : 'MongoDB'}</span></div>
+                ${data.storage.type === 'file' 
+                    ? `<div class="config-item"><span class="config-key">Путь к данным</span><span class="config-value">${data.storage.path || './data'}</span></div>`
+                    : `<div class="config-item"><span class="config-key">MongoDB URL</span><span class="config-value">${data.storage.mongoUrl || '--'}</span></div>
+                       <div class="config-item"><span class="config-key">База данных</span><span class="config-value">${data.storage.mongoDb || 'data_mirror'}</span></div>`
+                }`;
 
             document.getElementById('footerSymbols').textContent = `${symbolsMap.size} символов`;
             document.getElementById('footerMessages').textContent = `${formatNumber(totalMessages)} сообщений`;

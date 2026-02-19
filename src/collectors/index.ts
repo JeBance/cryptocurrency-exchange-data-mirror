@@ -117,8 +117,12 @@ export class DataCollector {
       startTime: this.startTime,
       connections: Array.from(this.connectors.values()).map(c => c.getStatus()),
       stats: Array.from(this.stats.values()),
-      storageType: config.storage.type,
-      storagePath: config.storage.path
+      storage: {
+        type: config.storage.type,
+        path: config.storage.path,
+        mongoUrl: config.storage.mongoUrl,
+        mongoDb: config.storage.mongoDb
+      }
     }
   }
 }
